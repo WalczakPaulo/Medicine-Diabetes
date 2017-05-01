@@ -25,20 +25,26 @@ def read_data():
     with open('data.csv') as csvfile:
         rows = csv.reader(csvfile)
         dataset = list(rows)
+        dataset = datatype_change(dataset, float)
     return dataset
+
+
+def datatype_change(item, func):
+    if isinstance(item, list):
+        return [datatype_change(x, func) for x in item]
+    return func(item)
 
 
 def read_and_split_data():
     dataset = read_data()
-
-    shuffle(dataset)
     dataset = np.array(dataset)
-    training_size = int(0.9*len(dataset))
+    dataset = dataset/dataset.max(axis=0)
+    training_size = int(0.8*len(dataset))
     test_x = list(dataset[:-training_size][:, :-1])
-    test_y = [[1-int(element), int(element)] for element in list(dataset[:-training_size][:, -1])]
+    test_y = [[element, 1-element] for element in list(dataset[:-training_size][:, -1])]
     train_x = list(dataset[-training_size:][:, :-1])
-    train_y = [[1-int(element), int(element)] for element in list(dataset[-training_size:][:,-1])]
+    train_y = [[element, 1-element] for element in list(dataset[-training_size:][:,-1])]
 
     return train_x, train_y, test_x, test_y
 
-#read_and_split_data()
+read_and_split_data()

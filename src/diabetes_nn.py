@@ -6,12 +6,12 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 train_x, train_y, test_x, test_y = read_and_split_data()
 NUMBER_OF_ATTRIBUTES = 8
-n_nodes_hl1 = 500
-n_nodes_hl2 = 500
-n_nodes_hl3 = 500
+n_nodes_hl1 = 8
+n_nodes_hl2 = 8
+n_nodes_hl3 = 8
 
 n_classes = 2
-batch_size = 10
+batch_size = 100
 
 x = tf.placeholder('float', [None, NUMBER_OF_ATTRIBUTES])
 y = tf.placeholder('float')
@@ -27,7 +27,7 @@ def neural_network_model(data):
     hidden_3_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl2, n_nodes_hl3])),
                       'biases': tf.Variable(tf.random_normal([n_nodes_hl3]))}
 
-    output_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl3, n_classes])),
+    output_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl1, n_classes])),
                     'biases': tf.Variable(tf.random_normal([n_classes]))}
 
     l1 = tf.add(tf.matmul(data, hidden_1_layer['weights']), hidden_1_layer['biases'])
@@ -39,7 +39,7 @@ def neural_network_model(data):
     l3 = tf.add(tf.matmul(l2, hidden_3_layer['weights']), hidden_3_layer['biases'])
     l3 = tf.nn.relu(l3)
 
-    output = tf.matmul(l3, output_layer['weights']) + output_layer['biases']
+    output = tf.matmul(l2, output_layer['weights']) + output_layer['biases']
 
     return output
 
@@ -47,8 +47,8 @@ def neural_network_model(data):
 def train_neural_network(x):
     prediction = neural_network_model(x)
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=y))
-    optimizer = tf.train.AdamOptimizer().minimize(cost)
-    hm_iterations = 10
+    optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(cost)
+    hm_iterations = 200
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
@@ -58,8 +58,6 @@ def train_neural_network(x):
             while batch_counter < len(train_x):
                 start = batch_counter
                 end = batch_counter + batch_size
-                #if end > len(train_x):
-                #    end = len(train_x)
                 batch_x = np.array(train_x[start:end])
                 batch_y = np.array(train_y[start:end])
                 batch_counter += batch_size
