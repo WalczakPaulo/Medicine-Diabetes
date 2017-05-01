@@ -10,8 +10,8 @@ n_nodes_hl1 = 500
 n_nodes_hl2 = 500
 n_nodes_hl3 = 500
 
-n_classes = 1
-batch_size = 100
+n_classes = 2
+batch_size = 10
 
 x = tf.placeholder('float', [None, NUMBER_OF_ATTRIBUTES])
 y = tf.placeholder('float')
@@ -48,28 +48,32 @@ def train_neural_network(x):
     prediction = neural_network_model(x)
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=y))
     optimizer = tf.train.AdamOptimizer().minimize(cost)
-    hm_epochs = 10
+    hm_iterations = 10
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
-        for epoch in range(hm_epochs):
-            epoch_loss = 0
+        for iteration in range(hm_iterations):
+            iteration_loss = 0
             batch_counter = 0
             while batch_counter < len(train_x):
                 start = batch_counter
                 end = batch_counter + batch_size
-                if(end > len(train_x)):
-                    end = len(train_x)
+                #if end > len(train_x):
+                #    end = len(train_x)
                 batch_x = np.array(train_x[start:end])
                 batch_y = np.array(train_y[start:end])
                 batch_counter += batch_size
-                #epoch_x, epoch_y = mnist.train.next_batch(batch_size)
                 _, c = sess.run([optimizer, cost], feed_dict={x: batch_x, y: batch_y})
-                epoch_loss += c
-            print('Epoch ', epoch, 'completed out of', hm_epochs, ' loss: ', epoch_loss)
+                iteration_loss += c
+            print('Iteration ', iteration + 1, 'completed out of', hm_iterations, ' loss: ', iteration_loss)
 
         correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
         accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
         print('Accuracy: ', accuracy.eval({x: test_x, y: test_y}))
 
-train_neural_network(x)
+
+def main():
+    train_neural_network(x)
+
+if __name__ == '__main__':
+    main()
