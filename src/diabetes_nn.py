@@ -6,9 +6,9 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 train_x, train_y, test_x, test_y = read_and_split_data()
 NUMBER_OF_ATTRIBUTES = 8
-n_nodes_hl1 = 8
-n_nodes_hl2 = 8
-n_nodes_hl3 = 8
+n_nodes_hl1 = 20
+n_nodes_hl2 = 10
+n_nodes_hl3 = 5
 
 n_classes = 2
 batch_size = 100
@@ -27,7 +27,7 @@ def neural_network_model(data):
     hidden_3_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl2, n_nodes_hl3])),
                       'biases': tf.Variable(tf.random_normal([n_nodes_hl3]))}
 
-    output_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl1, n_classes])),
+    output_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl2, n_classes])),
                     'biases': tf.Variable(tf.random_normal([n_classes]))}
 
     l1 = tf.add(tf.matmul(data, hidden_1_layer['weights']), hidden_1_layer['biases'])
@@ -48,7 +48,7 @@ def train_neural_network(x):
     prediction = neural_network_model(x)
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=y))
     optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(cost)
-    hm_iterations = 200
+    hm_iterations = 5000
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
