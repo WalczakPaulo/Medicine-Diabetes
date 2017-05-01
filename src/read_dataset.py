@@ -37,10 +37,9 @@ def datatype_change(item, func):
 
 def read_and_split_data():
     dataset = read_data()
-
     dataset = np.array(dataset)
-    dataset = dataset/dataset.max(axis=0)
     shuffle(dataset)
+    dataset = dataset/dataset.max(axis=0)
     training_size = int(0.8*len(dataset))
     test_x = list(dataset[:-training_size][:, :-1])
     test_y = [[element, 1-element] for element in list(dataset[:-training_size][:, -1])]

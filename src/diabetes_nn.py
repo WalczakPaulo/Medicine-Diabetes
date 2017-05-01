@@ -6,9 +6,9 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 train_x, train_y, test_x, test_y = read_and_split_data()
 NUMBER_OF_ATTRIBUTES = 8
-n_nodes_hl1 = 20
-n_nodes_hl2 = 10
-n_nodes_hl3 = 5
+n_nodes_hl1 = 200
+n_nodes_hl2 = 8
+n_nodes_hl3 = 10
 
 n_classes = 2
 batch_size = 100
@@ -27,7 +27,7 @@ def neural_network_model(data):
     hidden_3_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl2, n_nodes_hl3])),
                       'biases': tf.Variable(tf.random_normal([n_nodes_hl3]))}
 
-    output_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl2, n_classes])),
+    output_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl1, n_classes])),
                     'biases': tf.Variable(tf.random_normal([n_classes]))}
 
     l1 = tf.add(tf.matmul(data, hidden_1_layer['weights']), hidden_1_layer['biases'])
@@ -39,7 +39,7 @@ def neural_network_model(data):
     l3 = tf.add(tf.matmul(l2, hidden_3_layer['weights']), hidden_3_layer['biases'])
     l3 = tf.nn.relu(l3)
 
-    output = tf.matmul(l2, output_layer['weights']) + output_layer['biases']
+    output = tf.matmul(l1, output_layer['weights']) + output_layer['biases']
 
     return output
 
