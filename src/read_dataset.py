@@ -35,9 +35,9 @@ def read_and_split_data():
     dataset = np.array(dataset)
     training_size = int(0.9*len(dataset))
     test_x = list(dataset[:-training_size][:, :-1])
-    test_y = list(dataset[:-training_size][:, -1])
+    test_y = [[element] for element in list(dataset[:-training_size][:, -1])]
     train_x = list(dataset[-training_size:][:, :-1])
-    train_y = list(dataset[-training_size:][:,-1])
+    train_y = [[element] for element in list(dataset[-training_size:][:,-1])]
 
     return train_x, train_y, test_x, test_y
 
