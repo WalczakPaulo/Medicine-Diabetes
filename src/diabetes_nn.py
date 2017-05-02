@@ -5,15 +5,15 @@ from tensorflow.examples.tutorials.mnist import input_data
 from read_data import get_data
 train_x, train_y, test_x, test_y = get_data()
 NUMBER_OF_ATTRIBUTES = 8
-n_nodes_hl1 = 50
-n_nodes_hl2 = 10
-n_nodes_hl3 = 10
-n_nodes_hl4 = 10
-n_nodes_hl5 = 10
+n_nodes_hl1 = 500
+n_nodes_hl2 = 500
+n_nodes_hl3 = 500
+n_nodes_hl4 = 500
+n_nodes_hl5 = 500
 
 
 n_classes = 2
-batch_size = 100
+batch_size = 10
 
 x = tf.placeholder('float', [None, NUMBER_OF_ATTRIBUTES])
 y = tf.placeholder('float')
@@ -39,7 +39,7 @@ def neural_network_model(data):
                     'biases': tf.Variable(tf.random_normal([n_classes]))}
 
     l1 = tf.add(tf.matmul(data, hidden_1_layer['weights']), hidden_1_layer['biases'])
-    l1 = tf.nn.relu(l1)
+    l1 = tf.nn.tanh(l1)
 
     l2 = tf.add(tf.matmul(l1, hidden_2_layer['weights']), hidden_2_layer['biases'])
     l2 = tf.nn.relu(l2)
@@ -53,7 +53,7 @@ def neural_network_model(data):
     l5 = tf.add(tf.matmul(l4, hidden_5_layer['weights']), hidden_5_layer['biases'])
     l5 = tf.nn.relu(l5)
 
-    output = tf.matmul(l2, output_layer['weights']) + output_layer['biases']
+    output = tf.matmul(l1, output_layer['weights']) + output_layer['biases']
 
     return output
 

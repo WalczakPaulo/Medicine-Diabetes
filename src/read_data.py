@@ -6,6 +6,7 @@ from sklearn.preprocessing import Normalizer
 from sklearn import datasets, metrics, cross_validation
 from sklearn.cross_validation import train_test_split
 from sklearn import preprocessing
+from sklearn.decomposition import PCA
 # Pima Indians Diabetes dataset (UCI Machine Learning Repository)
 
 def get_data():
@@ -15,6 +16,8 @@ def get_data():
     dataset = np.loadtxt(raw_data, delimiter=",")
     print(dataset.shape)
     X = dataset[:, 0:8]
+    pca = PCA(n_components=4, whiten=True)
+    pca.fit(X)
     y = dataset[:, 8]
     X= preprocessing.scale(X)
     min_max_scaler = preprocessing.MinMaxScaler()
