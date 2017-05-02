@@ -1,6 +1,7 @@
 import csv
-from random import shuffle
 import numpy as np
+from sklearn.preprocessing import normalize
+
 '''
 Data Format:
 1. Number of times pregnant.
@@ -38,14 +39,17 @@ def datatype_change(item, func):
 def read_and_split_data():
     dataset = read_data()
     dataset = np.array(dataset)
-    shuffle(dataset)
-    dataset = dataset/dataset.max(axis=0)
-    training_size = int(0.8*len(dataset))
+    np.random.shuffle(dataset)
+    #dataset = dataset/dataset.max(axis=0)
+    #dataset[:-1][:,-1] = normalize(dataset[:-1][:,-1], axis=0, norm='l1')
+    training_size = int(0.7*len(dataset))
     test_x = list(dataset[:-training_size][:, :-1])
+    test_x = normalize(test_x, axis=0, norm="l1")
     test_y = [[element, 1-element] for element in list(dataset[:-training_size][:, -1])]
     train_x = list(dataset[-training_size:][:, :-1])
-    train_y = [[element, 1-element] for element in list(dataset[-training_size:][:,-1])]
-
+    train_x = normalize(train_x, axis=0, norm="l1")
+    train_y = [[element, 1-element] for element in list(dataset[-training_size:][:, -1])]
+    sumlol = np.sum(train_x, axis=0)
     return train_x, train_y, test_x, test_y
 
 read_and_split_data()
