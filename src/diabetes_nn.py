@@ -5,19 +5,26 @@ from tensorflow.examples.tutorials.mnist import input_data
 from read_data import get_data
 train_x, train_y, test_x, test_y = get_data()
 NUMBER_OF_ATTRIBUTES = 8
-n_nodes_hl1 = 500
-n_nodes_hl2 = 500
-n_nodes_hl3 = 500
+steps = 5000
+GLOBAL_STEP = 0.01
+n_nodes_hl1 = 20
+n_nodes_hl2 = 50
+n_nodes_hl3 = 4
 n_nodes_hl4 = 500
 n_nodes_hl5 = 500
 
 
 n_classes = 2
-batch_size = 10
+batch_size = 20
 
 x = tf.placeholder('float', [None, NUMBER_OF_ATTRIBUTES])
 y = tf.placeholder('float')
 
+
+def exp_decay(global_step):
+    return tf.train.exponential_decay(
+        learning_rate=0.01, global_step=global_step,
+        decay_steps=steps, decay_rate=0.01)
 
 def neural_network_model(data):
     hidden_1_layer = {'weights': tf.Variable(tf.random_normal([len(train_x[0]), n_nodes_hl1])),
@@ -35,7 +42,7 @@ def neural_network_model(data):
     hidden_5_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl4, n_nodes_hl5])),
                       'biases': tf.Variable(tf.random_normal([n_nodes_hl5]))}
 
-    output_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl2, n_classes])),
+    output_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl1, n_classes])),
                     'biases': tf.Variable(tf.random_normal([n_classes]))}
 
     l1 = tf.add(tf.matmul(data, hidden_1_layer['weights']), hidden_1_layer['biases'])
@@ -61,8 +68,8 @@ def neural_network_model(data):
 def train_neural_network(x):
     prediction = neural_network_model(x)
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=y))
-    optimizer = tf.train.AdamOptimizer().minimize(cost)
-    hm_iterations = 500
+    optimizer = tf.train.AdamOptimizer(learning_rate=exp_decay(GLOBAL_STEP)).minimize(cost)
+    hm_iterations = 200
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
@@ -72,6 +79,8 @@ def train_neural_network(x):
             while batch_counter < len(train_x):
                 start = batch_counter
                 end = batch_counter + batch_size
+                if end > len(train_x):
+                    end = len(train_x) - 1
                 batch_x = np.array(train_x[start:end])
                 batch_y = np.array(train_y[start:end])
                 batch_counter += batch_size
