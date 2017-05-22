@@ -1,15 +1,14 @@
 import tensorflow as tf
 import numpy as np
-from read_dataset import read_and_split_data
 from tensorflow.examples.tutorials.mnist import input_data
 from read_data import get_data
 train_x, train_y, test_x, test_y = get_data()
-NUMBER_OF_ATTRIBUTES = 8
+NUMBER_OF_ATTRIBUTES = 3
 steps = 5000
 GLOBAL_STEP = 0.01
-n_nodes_hl1 = 20
-n_nodes_hl2 = 50
-n_nodes_hl3 = 4
+n_nodes_hl1 = 10
+n_nodes_hl2 = 10
+n_nodes_hl3 = 100
 n_nodes_hl4 = 500
 n_nodes_hl5 = 500
 
@@ -25,6 +24,7 @@ def exp_decay(global_step):
     return tf.train.exponential_decay(
         learning_rate=0.01, global_step=global_step,
         decay_steps=steps, decay_rate=0.01)
+
 
 def neural_network_model(data):
     hidden_1_layer = {'weights': tf.Variable(tf.random_normal([len(train_x[0]), n_nodes_hl1])),
@@ -42,7 +42,7 @@ def neural_network_model(data):
     hidden_5_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl4, n_nodes_hl5])),
                       'biases': tf.Variable(tf.random_normal([n_nodes_hl5]))}
 
-    output_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl1, n_classes])),
+    output_layer = {'weights': tf.Variable(tf.random_normal([n_nodes_hl2, n_classes])),
                     'biases': tf.Variable(tf.random_normal([n_classes]))}
 
     l1 = tf.add(tf.matmul(data, hidden_1_layer['weights']), hidden_1_layer['biases'])
@@ -60,7 +60,7 @@ def neural_network_model(data):
     l5 = tf.add(tf.matmul(l4, hidden_5_layer['weights']), hidden_5_layer['biases'])
     l5 = tf.nn.relu(l5)
 
-    output = tf.matmul(l1, output_layer['weights']) + output_layer['biases']
+    output = tf.matmul(l2, output_layer['weights']) + output_layer['biases']
 
     return output
 
@@ -69,7 +69,7 @@ def train_neural_network(x):
     prediction = neural_network_model(x)
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=y))
     optimizer = tf.train.AdamOptimizer(learning_rate=exp_decay(GLOBAL_STEP)).minimize(cost)
-    hm_iterations = 200
+    hm_iterations = 100
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
@@ -89,10 +89,10 @@ def train_neural_network(x):
             print('Iteration ', iteration + 1, 'completed out of', hm_iterations, ' loss: ', iteration_loss)
             correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
             accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
-            print('Accuracy: ', accuracy.eval({x: train_x, y: train_y}))
+            print('Train ', accuracy.eval({x: train_x, y: train_y}))
         correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
         accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
-        print('Accuracy: ', accuracy.eval({x: test_x, y: test_y}))
+        print('Test: ', accuracy.eval({x: test_x, y: test_y}))
 
 
 def main():
