@@ -2,13 +2,15 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.examples.tutorials.mnist import input_data
 from read_data import get_data
+import tkinter
+import matplotlib.pyplot as plt
 train_x, train_y, test_x, test_y = get_data()
-NUMBER_OF_ATTRIBUTES = 3
+NUMBER_OF_ATTRIBUTES = 6
 steps = 5000
 GLOBAL_STEP = 0.01
-n_nodes_hl1 = 10
+n_nodes_hl1 = 50
 n_nodes_hl2 = 10
-n_nodes_hl3 = 100
+n_nodes_hl3 = 500
 n_nodes_hl4 = 500
 n_nodes_hl5 = 500
 
@@ -68,8 +70,9 @@ def neural_network_model(data):
 def train_neural_network(x):
     prediction = neural_network_model(x)
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=y))
-    optimizer = tf.train.AdamOptimizer(learning_rate=exp_decay(GLOBAL_STEP)).minimize(cost)
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.01).minimize(cost)
     hm_iterations = 100
+    history_loss=[]
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
@@ -84,15 +87,23 @@ def train_neural_network(x):
                 batch_x = np.array(train_x[start:end])
                 batch_y = np.array(train_y[start:end])
                 batch_counter += batch_size
-                _, c = sess.run([optimizer, cost], feed_dict={x: batch_x, y: batch_y})
+                _, c= sess.run([optimizer, cost], feed_dict={x: batch_x, y: batch_y})
                 iteration_loss += c
             print('Iteration ', iteration + 1, 'completed out of', hm_iterations, ' loss: ', iteration_loss)
             correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
             accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
             print('Train ', accuracy.eval({x: train_x, y: train_y}))
+            print('Test: ', accuracy.eval({x: test_x, y: test_y}))
+            history_loss.append(iteration_loss)
         correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
         accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
-        print('Test: ', accuracy.eval({x: test_x, y: test_y}))
+        #print('Test: ', accuracy.eval({x: test_x, y: test_y}))
+        plt.figure()
+        plt.xlabel("Iter")
+        plt.ylabel("Blad")
+        plt.plot(history_loss)
+        plt.show()
+
 
 
 def main():

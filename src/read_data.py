@@ -19,13 +19,11 @@ Data Format:
 6. Body mass index (weight in kg/(height in m)^2)
 7. Diabetes pedigree function
 8. Age (years)
-9. Class variable (0 or 1) 
-
+9. Class variable (0 or 1)
 read_data() returns list of lists:
 ..where original data ...
 [['6', '148', '72', '35', '0', '33.6', '0.627', '50', '1'],...],
 ..is split into training and testing sets, and normalized to be efficiently used by neural network. Also PCA reduction is used
-
 '''
 def get_data():
     url = "http://archive.ics.uci.edu/ml/machine-learning-databases/pima-indians-diabetes/pima-indians-diabetes.data"
@@ -34,7 +32,7 @@ def get_data():
     dataset = np.loadtxt(raw_data, delimiter=",")
     print(dataset.shape)
     X = dataset[:, 0:8]
-    pca = decomposition.PCA(n_components=3)
+    pca = decomposition.PCA(n_components=6)
     pca.fit(X)
     X = pca.transform(X)
     y = dataset[:, 8]
@@ -47,4 +45,4 @@ def get_data():
     y_test = [[element, 1 - element] for element in y_test]
     return X_train, y_train, X_test, y_test
 
-#get_data()
+#print(get_data())
